@@ -5,22 +5,19 @@ from core.models import Event, Performer, Venue, Ticket
 class PerformerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Performer
-        fields = ["id", "name"]
+        fields = ["id", "name", "description"]
         #read_only_fields =["id"] modelserializer automatically makes primary keys readonly
 
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = ["id", "name", "location", "capacity"]
-        read_only_fields =["id"]
-
 
 class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
         fields = ["id", "title", "venue", "performer","description", "starts_at", "ends_at"]
-        read_only_fields =["id"]
 
 
 class EventReadSerializer(EventSerializer):

@@ -2,8 +2,8 @@ from rest_framework import viewsets, permissions
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Q
-from core.models import Event
-from .serializers import EventSerializer, EventReadSerializer
+from core.models import Event, Performer, Venue
+from .serializers import EventSerializer, EventReadSerializer, PerformerSerializer, VenueSerializer
 
 
 
@@ -33,3 +33,13 @@ class EventViewSet(viewsets.ModelViewSet):
         return EventReadSerializer
 
 
+class VenueViewSet(viewsets.ModelViewSet):
+    queryset = Venue.objects.all()
+    serializer_class = VenueSerializer
+    permission_classes = [IsAdminorReadPermission]
+
+
+class PerformerViewSet(viewsets.ModelViewSet):
+    queryset = Performer.objects.all()
+    serializer_class = PerformerSerializer
+    permission_classes = [IsAdminorReadPermission]
