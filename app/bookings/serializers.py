@@ -3,7 +3,7 @@ from rest_framework import serializers
 from core.models import Ticket, TicketStatus
 
 
-class TicketSerialzier(serializers.Serializer):
+class TicketSerializer(serializers.Serializer):
     ticket_id = serializers.IntegerField()
 
     def validate_ticket_id(self, value):
