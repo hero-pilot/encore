@@ -6,7 +6,7 @@ from django.conf import settings
 r = settings.REDIS_BOOKING_CLIENT
 TICKET_TTL = 600
 
-class TicketView(APIView):
+class TicketBookingView(APIView):
     def post(self, request):
         serializer = TicketSerializer(data = request.data)
 
