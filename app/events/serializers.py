@@ -32,8 +32,7 @@ class EventReadSerializer(EventSerializer):
         fields = EventSerializer.Meta.fields + ["available_tickets"]
 
     def get_available_tickets(self, obj):
-        db_available = obj.tickets.filter(status="AVAILABLE").count()
-
+        db_available = getattr(obj, 'db_available_tickets', 0)
         return db_available
 
 
