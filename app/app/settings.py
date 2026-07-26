@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django_elasticsearch_dsl',
     'django_filters', 
     "core",
+    "user",
+    "events",
 ]
 
 MIDDLEWARE = [
