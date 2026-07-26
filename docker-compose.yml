@@ -1,0 +1,167 @@
+services:
+  app:
+    build: .
+    volumes:
+      - ./app:/app
+    environment:                
+      - DB_HOST=postgres
+      - DB_NAME=db
+      - DB_USER=shitman
+      - DB_PASS=shitman
+      - REDIS_URL=redis://redis:6379/0
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - app-network
+  postgres:
+    image: postgres:17.4-alpine3.21
+    restart: always
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=shitman
+      - POSTGRES_PASSWORD=shitman
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:                   
+      test: ["CMD-SHELL", "pg_isready -U shitman -d db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - app-network
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: es
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false          # Disable SSL/auth for local dev
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m        # Prevents memory blowouts
+      - path.repo=/usr/share/elasticsearch/data # For snapshots (optional)
+    ports:
+      - "9200:9200"                           # REST API
+      - "9300:9300"                           # Internal cluster comms
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+  celery-worker:
+    build: .
+    command: celery -A app worker --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy 
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DB_HOST=postgres
+      - DB_NAME=db
+      - DB_USER=shitman
+      - DB_PASS=shitman
+      - DJANGO_SETTINGS_MODULE=app.settings
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+    env_file:
+      - ./.env
+    volumes:
+      - ./app:/app
+    restart: unless-stopped
+    networks:
+      - app-network
+  redis:
+      image: redis:alpine 
+      restart: always
+      ports:
+        - "6379:6379"
+      command: >
+        redis-server
+        --appendonly yes
+        --appendfsync everysec
+        --save 900 1
+        --save 300 10
+        --save 60 10000
+        --aof-use-rdb-preamble yes
+        --maxmemory 256mb
+        --maxmemory-policy volatile-lru
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 5s
+        timeout: 3s
+        retries: 5
+      volumes:
+        - redis-data:/data
+      networks:
+      - app-network
+  redisinsight:
+    image: redis/redisinsight
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "5540:5540"
+    restart: always
+    networks:
+      - app-network
+  flower:                           
+    image: mher/flower:latest
+    command: >
+      celery flower --port=5555
+    ports:
+      - "5555:5555"                  
+    environment:
+     - FLOWER_BASIC_AUTH=shitman:shitman
+     - CELERY_BROKER_URL=redis://redis:6379/0
+     - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      celery-worker:
+          condition: service_started
+      redis:
+          condition: service_healthy 
+    networks:
+      - app-network
+  mailpit:
+    image: axllent/mailpit        
+    restart: unless-stopped
+    ports:
+      - "8025:8025"                 
+      - "1025:1025"                
+    volumes:
+      - mailpit-data:/data          
+    environment:
+      MP_MAX_MESSAGES: 5000       
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1    
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+  mailpit-data:
+  redis-data:
+  es-data: 
+networks:
+  app-network:
+    driver: bridge
