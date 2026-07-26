@@ -14,12 +14,7 @@ class IsAdminorReadPermission(permissions.BasePermission):
         return request.user and request.user.is_staff
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.select_related("venue" , "performer").annotate(
-        db_available_tickets=Count(
-            'tickets', 
-            filter=Q(tickets__status="AVAILABLE")
-        )
-    ).all()
+    queryset = Event.objects.select_related("venue" , "performer").filter(tickets__status="AVAILABLE")
     permission_classes = [IsAdminorReadPermission]
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
