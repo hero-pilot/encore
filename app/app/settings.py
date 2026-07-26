@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     'django_elasticsearch_dsl',
     'django_filters', 
-    "app",
+    "core",
 ]
 
 MIDDLEWARE = [
