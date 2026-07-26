@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "core",
     "user",
     "events",
+    "bookings",
 ]
 
 MIDDLEWARE = [
