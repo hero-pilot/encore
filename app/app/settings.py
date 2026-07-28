@@ -235,3 +235,7 @@ CELERY_BEAT_SCHEDULE = {
 
 
 
+ELASTICSEARCH_HOST = os.getenv(
+    "ELASTICSEARCH_HOST",
+    "http://localhost:9200",
+)
