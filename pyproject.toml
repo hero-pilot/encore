@@ -16,6 +16,7 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.1",
     "drf-yasg>=1.21.15",
     "elasticsearch>=9.4.1",
+    "elasticsearch-dsl>=0.0.9",
     "psycopg[binary,pool]>=3.3.4",
     "redis>=8.0.1",
     "stripe>=15.3.1",

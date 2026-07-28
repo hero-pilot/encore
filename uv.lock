@@ -405,6 +405,20 @@ wheels = [
 ]
 
 [[package]]
+name = "elasticsearch-dsl"
+version = "0.0.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "elasticsearch" },
+    { name = "python-dateutil" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2f/fe/99d8b134fe5e50f7d3527772d227ec41c33fff224db26ae7c8ce001160de/elasticsearch-dsl-0.0.9.tar.gz", hash = "sha256:72c108f794a79b154c32cf594a1185459338d6aaec337051f03b2034a16eacbd", size = 28952, upload-time = "2015-10-26T20:42:44.515Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/b7/890e200f2cd1e22d1c987060c0a1af088731da5851766d2ca2f120ec8778/elasticsearch_dsl-0.0.9-py2.py3-none-any.whl", hash = "sha256:9b5404180d2747fa2e43c2e5cd78d39241cb80d041f492cccdd2a2e6272b0bda", size = 38707, upload-time = "2015-10-26T20:42:50.288Z" },
+]
+
+[[package]]
 name = "idna"
 version = "3.18"
 source = { registry = "https://pypi.org/simple" }
@@ -613,6 +627,7 @@ dependencies = [
     { name = "djangorestframework-simplejwt" },
     { name = "drf-yasg" },
     { name = "elasticsearch" },
+    { name = "elasticsearch-dsl" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "redis" },
     { name = "stripe" },
@@ -631,6 +646,7 @@ requires-dist = [
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },
     { name = "drf-yasg", specifier = ">=1.21.15" },
     { name = "elasticsearch", specifier = ">=9.4.1" },
+    { name = "elasticsearch-dsl", specifier = ">=0.0.9" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.4" },
     { name = "redis", specifier = ">=8.0.1" },
     { name = "stripe", specifier = ">=15.3.1" },
