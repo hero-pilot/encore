@@ -17,8 +17,8 @@ class TicketBookingView(APIView):
 
         was_set = r.setnx(f"ticket:{ticket_id}",  user_id)
         if was_set:
-            r.expire(f'hold:ticket:{ticket_id}', TICKET_TTL)
-            return Response({"status": "held"}, status=200)
-        return Response({"status": "Missed it"}, status=409)
+            r.expire(f'ticket:{ticket_id}', TICKET_TTL)
+            return Response({"status": "reserved"}, status=200)
+        return Response({"status": "Already reserved"}, status=409)
 
 
