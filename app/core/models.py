@@ -36,6 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class TicketStatus(models.TextChoices):
     AVAILABLE = "AVAILABLE"
     RESERVED = "RESERVED"
+    PURCHASED = "PURCHASED"
 
 class Venue(models.Model):
     name = models.CharField(max_length=255)
@@ -76,6 +77,7 @@ class Ticket(models.Model):
     status = models.CharField(max_length=20, choices=TicketStatus.choices, default=TicketStatus.AVAILABLE)
     price = models.PositiveBigIntegerField()
     purchased_at = models.DateTimeField(null=True, blank=True)
+    reserved_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [
