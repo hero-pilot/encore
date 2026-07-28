@@ -90,6 +90,30 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+  celery_beat:
+    build: .
+    command: celery -A app beat --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DB_HOST=postgres
+      - DB_NAME=db
+      - DB_USER=shitman
+      - DB_PASS=shitman
+      - DJANGO_SETTINGS_MODULE=app.settings
+    env_file:
+      - ./.env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy 
+    restart: unless-stopped
+    networks:
+      - app-network
+    volumes:
+      - ./app:/app
   redis:
       image: redis:alpine 
       restart: always
