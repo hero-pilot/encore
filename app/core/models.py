@@ -87,3 +87,4 @@ class Ticket(models.Model):
                 violation_error_message="This seat and event already exist."
             )
         ]
+        indexes = [models.Index(fields=['status', 'reserved_at'])]
