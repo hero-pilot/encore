@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.utils import timezone
 from .serializers import TicketSerializer
+from core.models import Ticket, TicketStatus
 from django.conf import settings
 
-r = settings.REDIS_BOOKING_CLIENT
-TICKET_TTL = 600
 
 class TicketBookingView(APIView):
     def post(self, request):
@@ -14,11 +14,22 @@ class TicketBookingView(APIView):
 
         ticket_id = serializer.validated_data["ticket_id"]
         user_id = request.user.id
+        updated_rows = Ticket.objects.filter(
+            id=ticket_id,
+            status=TicketStatus.AVAILABLE  
+        ).update(
+            user=user_id,
+            status=TicketStatus.RESERVED,
+            reserved_at=timezone.now()
+        )
 
-        was_set = r.setnx(f"ticket:{ticket_id}",  user_id)
-        if was_set:
-            r.expire(f'ticket:{ticket_id}', TICKET_TTL)
-            return Response({"status": "reserved"}, status=200)
-        return Response({"status": "Already reserved"}, status=409)
+        
+        if updated_rows == 0:
+            return Response(
+                {"error": "Ticket is no longer available."},
+                status=409  
+            )
+
+        return Response({"status": "reserved"}, status=200)
 
 
