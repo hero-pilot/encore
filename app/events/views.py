@@ -17,7 +17,7 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminorReadPermission]
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['performer', 'venue', 'starts_at']
+    filterset_fields = ['performer', 'venue', 'starts_at__date']
     ordering_fields = ['starts_at', 'title']
     ordering = ['starts_at']  
 
