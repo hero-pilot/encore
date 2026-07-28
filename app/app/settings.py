@@ -234,8 +234,4 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': os.environ.get('ELASTICSEARCH_HOST', 'http://localhost:9200')
-    },
-}
+
