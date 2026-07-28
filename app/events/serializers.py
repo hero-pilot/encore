@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Event, Performer, Venue, Ticket
+from core.models import Event, Performer, Venue
 
 
 class PerformerSerializer(serializers.ModelSerializer):
@@ -29,8 +29,7 @@ class EventReadSerializer(EventSerializer):
         fields = EventSerializer.Meta.fields + ["available_tickets"]
 
     def get_available_tickets(self, obj):
-        db_available = getattr(obj, 'tickets')
-        return db_available
+        return obj.available_tickets
 
 
 
