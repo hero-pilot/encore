@@ -116,12 +116,11 @@ class StripeWebhookView(APIView):
             id=payment.ticket_id,
             status=TicketStatus.RESERVED,
             user=payment.user_id,
-        ).update(status=TicketStatus.SOLD)
+        ).update(status=TicketStatus.PURCHASED, purchased_at=timezone.now())
 
         if updated:
             payment.status = PaymentStatus.SUCCEEDED
         else:
-            # reservation was already released before the webhook arrived — refund
             stripe.Refund.create(payment_intent=intent["id"])
             payment.status = PaymentStatus.REFUNDED
         payment.save(update_fields=["status", "updated_at"])
