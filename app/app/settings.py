@@ -239,3 +239,4 @@ ELASTICSEARCH_DSL = {
         'hosts': os.environ.get('ELASTICSEARCH_HOST', 'http://localhost:9200')
     },
 }
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'search.signals.CelerySignalProcessor'
