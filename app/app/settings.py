@@ -240,3 +240,7 @@ ELASTICSEARCH_DSL = {
     },
 }
 ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'search.signals.CelerySignalProcessor'
+
+
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
