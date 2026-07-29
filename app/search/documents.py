@@ -24,8 +24,15 @@ class EventDocument(Document):
             'starts_at',
             'ends_at',
         ]
-
         related_models = [Performer, Venue]
 
     def get_queryset(self):
         return super().get_queryset().select_related('performer', 'venue')
+
+    def get_instances_from_related(self, related_instance):
+        """
+        Tells Elasticsearch which Event(s) to update when a 
+        related Venue or Performer object is saved or updated.
+        """
+        if isinstance(related_instance, (Performer, Venue)):
+            return related_instance.events.all()
