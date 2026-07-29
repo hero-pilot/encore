@@ -14,17 +14,17 @@ def expire_reserved_tickets():
         ).values_list("id", flat=True)
     )
 
-    updated = Ticket.objects.filter(id__in=expired_ids).update(
-        status=TicketStatus.AVAILABLE, reserved_at=None
-    )
+    updated = Ticket.objects.filter(id__in=expired_ids, status=TicketStatus.RESERVED)\
+        .update(status=TicketStatus.AVAILABLE, reserved_at=None)
 
     pending = list(Payment.objects.filter(ticket_id__in=expired_ids, status=PaymentStatus.PENDING))
     for payment in pending:
         try:
             stripe.PaymentIntent.cancel(payment.stripe_payment_intent_id)
+            payment.status = PaymentStatus.FAILED
         except stripe.error.InvalidRequestError:
             pass  # already succeeded — the webhook's refund path will catch it
-        payment.status = PaymentStatus.FAILED
+        
     Payment.objects.bulk_update(pending, ["status"])
 
     return f"Expired {updated} reservations"
