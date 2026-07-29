@@ -112,6 +112,9 @@ class StripeWebhookView(APIView):
         except Payment.DoesNotExist:
             return
 
+        if payment.status == PaymentStatus.SUCCEEDED:
+            return  # already processed — duplicate webhook delivery, not a real "ticket expired" case
+
         updated = Ticket.objects.filter(
             id=payment.ticket_id,
             status=TicketStatus.RESERVED,
