@@ -2,30 +2,30 @@ FROM python:3.14-alpine
 
 LABEL org.opencontainers.image.authors="https://github.com/bunker-pilot"
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    UV_PROJECT_ENVIRONMENT=/py
 
-# Copy requirements first to leverage Docker cache
-COPY ./requirements.txt /tmp/requirements.txt
-
-WORKDIR /app
+WORKDIR /build
 
 EXPOSE 8000
 
-# Install uv, create virtual environment, install dependencies, clean up, and add user
-RUN pip install --no-cache-dir uv && \
-    uv venv /py && \
-    uv pip install --no-cache -r /tmp/requirements.txt && \
-    rm -rf /tmp && \
-    adduser \
-        --disabled-password \
-        --no-create-home \
-        django-user
 
-# Copy application code after dependencies (better layer caching)
+COPY pyproject.toml uv.lock ./
+
+RUN pip install --no-cache-dir uv && \
+    uv sync --frozen --no-dev --no-install-project && \
+    rm -rf /tmp/* && mkdir -p /tmp && chmod 1777 /tmp && \
+    adduser -D -H django-user
+
+WORKDIR /app
+
+
 COPY ./app /app
 
-# Add the virtual environment's bin to PATH
+
 ENV PATH="/py/bin:$PATH"
 
-# Switch to non‑root user
+
 USER django-user
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
